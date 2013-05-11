@@ -13,9 +13,11 @@ TOWNS = []
      page = agent.get("http://oprs.co.monmouth.nj.us/oprs/clerk/ClerkHome.aspx?op=basic")
      page_form = page.form("aspnetForm") 
      page_form.field_with(name: "ctl00$ContentPlaceHolder1$ddlMunTab2").option_with(value: "COUNTY WIDE").click
-     page_form.field_with(name: "ctl00$ContentPlaceHolder1$ddlDocTypeTab2").option_with(value: "LISPEN").click
+     page_form.field_with(name: "ctl00$ContentPlaceHolder1$ddlDocTypeTab2").option_with(value: "LISPENFO").click
      page_form.field_with(name: "ctl00$ContentPlaceHolder1$txtFromTab2").value= (Time.now - 1.week).strftime('%m/%d/%Y')
      page_form.field_with(name: "ctl00$ContentPlaceHolder1$txtToTab2").value= (Time.now - 1.day).strftime('%m/%d/%Y')
+     page_form.field_with(name: "ctl00$ContentPlaceHolder1$ddlShowRecTab2").value= 100
+     page_form.field_with(name: "ctl00$ContentPlaceHolder1$ddlTotalRecTab2").value= 500
      button = page_form.button_with(:name => "ctl00$ContentPlaceHolder1$btnSearchTab2")
      response = agent.submit(page_form, button)
      puts response.body
@@ -33,7 +35,7 @@ TOWNS = []
        end
      end
     pendens
-  end
+  end 
 
   def self.scrape
     data = Scrape.perform
@@ -48,9 +50,7 @@ TOWNS = []
     no_tabs = string.gsub! /\t/, ''
     no_rows = no_tabs.gsub! /\r/, ''
     no_rows = no_rows.gsub! /\n/, ''
-    house = no_rows.scan(/[A-Z]+\s[A-Z]+/)
-    dates = no_rows.scan(/\d+\/\d+\/\d+/)
-    house << dates
+    no_rows.scan(/([^<td>]+)(?=<\/td>)/)
   end
 
 end
